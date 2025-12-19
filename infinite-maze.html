@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>∞ Ultimate Infinite Maze Website</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:Arial,Helvetica,sans-serif;background:#020617;color:#e5e7eb}
+
+header{padding:30px;text-align:center;background:#020617;border-bottom:1px solid #1e293b}
+
+section{height:100%;display:flex;flex-direction:column}
+.container{flex:1;padding:20px;overflow:hidden}
+
+/* MAZE GRID */
+.maze{
+  display:grid;
+  grid-template-columns:repeat(40,1fr);
+  gap:6px;
+  height:100%;
+}
+
+.cell{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:6px;
+  padding:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.cell.dead{background:#020617;opacity:.25}
+.cell.loop{border-color:#7c3aed}
+.cell.exit{border-color:#22c55e}
+
+.cell a{
+  color:#38bdf8;
+  font-size:11px;
+  text-decoration:none;
+  text-align:center;
+}
+
+.cell a:hover{color:#facc15}
+</style>
+</head>
+<body>
+
+<header>
+<h1>∞ ULTIMATE INFINITE MAZE</h1>
+<p>No scroll • No back • Endless paths • Dead ends • Fake exits</p>
+</header>
+
+<section>
+<div class="container">
+<div id="mazeRoot" class="maze"></div>
+</div>
+</section>
+
+<script>
+// =====================================
+// EXTREME INFINITE MAZE ENGINE (FIXED)
+// =====================================
+const mazeRoot = document.getElementById('mazeRoot');
+let depth = 0;
+const CELLS = 1200; // heavy maze
+
+function flash(){
+  document.body.style.background = '#7c3aed';
+  setTimeout(()=>document.body.style.background='#020617',120);
+}
+
+function generateMazeLayer(){
+  mazeRoot.innerHTML = '';
+  document.title = 'Maze depth: ' + depth;
+
+  for(let i=0;i<CELLS;i++){
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    const roll = Math.random();
+
+    // DEAD END
+    if(roll < 0.15){
+      cell.classList.add('dead');
+      cell.innerHTML = '<span>X</span>';
+    }
+    // LOOP
+    else if(roll < 0.30){
+      cell.classList.add('loop');
+      const a = document.createElement('a');
+      a.textContent = 'Loop';
+      a.href = '#';
+      a.onclick = e => {
+        e.preventDefault();
+        flash();
+        setTimeout(generateMazeLayer, 80);
+      };
+      cell.appendChild(a);
+    }
+    // FAKE EXIT
+    else if(roll < 0.32){
+      cell.classList.add('exit');
+      const a = document.createElement('a');
+      a.textContent = 'EXIT';
+      a.href = '#';
+      a.onclick = e => {
+        e.preventDefault();
+        flash();
+        alert('No escape.');
+        setTimeout(generateMazeLayer, 80);
+      };
+      cell.appendChild(a);
+    }
+    // REAL PATH
+    else{
+      const a = document.createElement('a');
+      a.textContent = 'Path ' + (++depth);
+      a.href = '#';
+      a.onclick = e => {
+        e.preventDefault();
+        flash();
+        setTimeout(generateMazeLayer, 80);
+      };
+      cell.appendChild(a);
+    }
+
+    mazeRoot.appendChild(cell);
+  }
+}
+
+// Disable back navigation
+history.pushState(null,null,location.href);
+window.onpopstate = () => history.pushState(null,null,location.href);
+
+// START
+generateMazeLayer();
+</script>
+
+</body>
+</html>
+
